@@ -1,0 +1,93 @@
+# ============================================
+# LiteLLM Configuration
+# ============================================
+
+# Model definitions
+model_list:
+  # OpenAI GPT-4
+  - model_name: gpt-4
+    litellm_params:
+      model: openai/gpt-4
+      api_key: os.environ/OPENAI_API_KEY
+
+  # OpenAI GPT-4 Turbo
+  - model_name: gpt-4-turbo
+    litellm_params:
+      model: openai/gpt-4-turbo-preview
+      api_key: os.environ/OPENAI_API_KEY
+
+  # OpenAI GPT-3.5 Turbo
+  - model_name: gpt-3.5-turbo
+    litellm_params:
+      model: openai/gpt-3.5-turbo
+      api_key: os.environ/OPENAI_API_KEY
+
+  # Anthropic Claude Sonnet
+  - model_name: claude-sonnet-4
+    litellm_params:
+      model: anthropic/claude-sonnet-4-20250514
+      api_key: os.environ/ANTHROPIC_API_KEY
+
+  # Anthropic Claude Opus
+  - model_name: claude-opus-4
+    litellm_params:
+      model: anthropic/claude-opus-4-20250514
+      api_key: os.environ/ANTHROPIC_API_KEY
+
+  # Azure OpenAI (example - uncomment and configure)
+  # - model_name: gpt-35-turbo-azure
+  #   litellm_params:
+  #     model: azure/gpt-35-turbo
+  #     api_base: os.environ/AZURE_API_BASE
+  #     api_key: os.environ/AZURE_API_KEY
+  #     api_version: "2023-05-15"
+
+  # Google Gemini (example - uncomment and configure)
+  # - model_name: gemini-pro
+  #   litellm_params:
+  #     model: gemini/gemini-pro
+  #     api_key: os.environ/GEMINI_API_KEY
+
+  # AWS Bedrock (example - uncomment and configure)
+  # - model_name: claude-bedrock
+  #   litellm_params:
+  #     model: bedrock/anthropic.claude-v2
+  #     aws_access_key_id: os.environ/AWS_ACCESS_KEY_ID
+  #     aws_secret_access_key: os.environ/AWS_SECRET_ACCESS_KEY
+  #     aws_region_name: us-east-1
+
+# LiteLLM settings
+litellm_settings:
+  # Drop unsupported parameters
+  drop_params: true
+
+  # Set verbose logging (set to false in production)
+  set_verbose: false
+
+  # Request timeout
+  request_timeout: 600
+
+  # Enable streaming
+  stream_timeout: 600
+
+# General settings
+general_settings:
+  # Master key for authentication
+  master_key: os.environ/LITELLM_MASTER_KEY
+
+  # Database URL for tracking and virtual keys
+  database_url: os.environ/DATABASE_URL
+
+  # Store model in database
+  store_model_in_db: true
+
+  # Enable fallbacks
+  enable_fallbacks: true
+
+# Optional: Router settings for load balancing
+# router_settings:
+#   routing_strategy: simple-shuffle
+#   model_group_alias:
+#     gpt-4-group:
+#       - gpt-4
+#       - gpt-4-turbo

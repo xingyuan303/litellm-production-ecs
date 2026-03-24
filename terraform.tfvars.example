@@ -1,0 +1,139 @@
+# ============================================
+# Example Terraform Variables Configuration
+# Copy this file to terraform.tfvars and fill in your values
+# ============================================
+
+# General Configuration
+project_name = "litellm"
+environment  = "production"
+aws_region   = "us-east-1"
+
+# Enable/Disable deletion protection for production
+enable_deletion_protection = true
+
+# ============================================
+# ECS Configuration
+# ============================================
+
+ecs_desired_count = 2
+ecs_min_capacity  = 2
+ecs_max_capacity  = 10
+
+# Task resources (4 vCPU, 8GB RAM)
+ecs_task_cpu    = 4096
+ecs_task_memory = 8192
+
+# Enable ECS Exec for debugging (disable in production)
+enable_ecs_exec = false
+
+# ============================================
+# Auto Scaling Configuration
+# ============================================
+
+# Target utilization percentages
+cpu_target_value    = 70
+memory_target_value = 75
+
+# Request count per target
+alb_request_count_target = 1000
+
+# Scheduled scaling (optional)
+enable_scheduled_scaling = false
+scheduled_scale_up_min   = 4
+scheduled_scale_up_max   = 10
+scheduled_scale_down_min = 2
+scheduled_scale_down_max = 4
+
+# ============================================
+# RDS Database Configuration
+# ============================================
+
+db_instance_class       = "db.t3.medium"
+db_engine_version       = "16.4"
+db_allocated_storage    = 100
+db_max_allocated_storage = 500
+
+db_name     = "litellm"
+db_username = "litellm_admin"
+
+# High availability
+db_multi_az = true
+
+# Backup configuration
+db_backup_retention_period = 7
+
+# Safety settings
+skip_final_snapshot = false
+db_apply_immediately = false
+
+# ============================================
+# Domain and SSL Configuration
+# ============================================
+
+# Set to true to enable HTTPS with custom domain
+enable_https = false
+
+# Your domain configuration (required if enable_https = true)
+# domain_name        = "example.com"
+# litellm_subdomain  = "litellm.example.com"
+
+# Optional: Additional domains
+# certificate_sans = ["api.example.com", "*.example.com"]
+
+# Optional features
+enable_ipv6        = false
+enable_health_check = false
+
+# ============================================
+# LiteLLM Configuration
+# ============================================
+
+# IMPORTANT: Generate secure keys before deploying
+# Example: openssl rand -hex 32
+
+litellm_master_key = "sk-your-master-key-here"
+litellm_salt_key   = "your-salt-key-here"
+
+litellm_log_level = "INFO"
+
+# Disable detailed debug in production
+enable_detailed_debug = false
+
+# ============================================
+# API Keys Configuration
+# ============================================
+
+# Add your LLM provider API keys here
+# These will be stored securely in AWS Secrets Manager
+
+openai_api_key    = ""  # sk-...
+anthropic_api_key = ""  # sk-ant-...
+azure_api_key     = ""  # Your Azure key
+gemini_api_key    = ""  # Your Gemini key
+
+# AWS Bedrock credentials (if using)
+aws_access_key_id     = ""
+aws_secret_access_key = ""
+
+# ============================================
+# Monitoring and Alerting
+# ============================================
+
+# SNS topic ARN for CloudWatch alarms (optional)
+# Create an SNS topic and subscribe your email first
+# alarm_sns_topic_arn = "arn:aws:sns:us-east-1:123456789012:litellm-alerts"
+
+alarm_sns_topic_arn = ""
+
+# CloudWatch logs retention
+cloudwatch_log_retention_days = 7
+
+# ============================================
+# Additional Tags
+# ============================================
+
+additional_tags = {
+  Project     = "LiteLLM"
+  CostCenter  = "Engineering"
+  Terraform   = "true"
+}

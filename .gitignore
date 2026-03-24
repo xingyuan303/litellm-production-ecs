@@ -1,0 +1,52 @@
+# ============================================
+# Git Ignore File
+# ============================================
+
+# Terraform files
+*.tfstate
+*.tfstate.*
+*.tfvars
+!terraform.tfvars.example
+.terraform/
+.terraform.lock.hcl
+crash.log
+override.tf
+override.tf.json
+*_override.tf
+*_override.tf.json
+
+# Sensitive files
+*.pem
+*.key
+*.crt
+.env
+.env.local
+secrets/
+
+# IDE
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+.DS_Store
+
+# Logs
+*.log
+logs/
+
+# Build artifacts
+dist/
+build/
+*.pyc
+__pycache__/
+
+# Docker
+.dockerignore
+
+# AWS
+.aws/
+
+# Backup files
+*.bak
+*.backup
