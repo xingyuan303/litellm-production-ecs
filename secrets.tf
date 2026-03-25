@@ -86,44 +86,47 @@ resource "aws_secretsmanager_secret_version" "gemini_api_key" {
   secret_string = var.gemini_api_key
 }
 
-# AWS Access Key (for Bedrock)
-resource "aws_secretsmanager_secret" "aws_access_key" {
-  count = var.aws_access_key_id != "" ? 1 : 0
-
-  name        = "${var.project_name}/aws_access_key_id"
-  description = "AWS Access Key ID for Bedrock"
-
-  tags = {
-    Name        = "${var.project_name}-aws-access-key"
-    Environment = var.environment
-    ManagedBy   = "Terraform"
-  }
-}
-
-resource "aws_secretsmanager_secret_version" "aws_access_key" {
-  count = var.aws_access_key_id != "" ? 1 : 0
-
-  secret_id     = aws_secretsmanager_secret.aws_access_key[0].id
-  secret_string = var.aws_access_key_id
-}
-
-# AWS Secret Key (for Bedrock)
-resource "aws_secretsmanager_secret" "aws_secret_key" {
-  count = var.aws_secret_access_key != "" ? 1 : 0
-
-  name        = "${var.project_name}/aws_secret_access_key"
-  description = "AWS Secret Access Key for Bedrock"
-
-  tags = {
-    Name        = "${var.project_name}-aws-secret-key"
-    Environment = var.environment
-    ManagedBy   = "Terraform"
-  }
-}
-
-resource "aws_secretsmanager_secret_version" "aws_secret_key" {
-  count = var.aws_secret_access_key != "" ? 1 : 0
-
-  secret_id     = aws_secretsmanager_secret.aws_secret_key[0].id
-  secret_string = var.aws_secret_access_key
-}
+# AWS Bedrock now uses IAM Role - no secrets needed! ✅
+# These secrets are commented out for security best practices
+#
+# # AWS Access Key (for Bedrock) - DEPRECATED
+# resource "aws_secretsmanager_secret" "aws_access_key" {
+#   count = var.aws_access_key_id != "" ? 1 : 0
+#
+#   name        = "${var.project_name}/aws_access_key_id"
+#   description = "AWS Access Key ID for Bedrock (DEPRECATED - use IAM Role)"
+#
+#   tags = {
+#     Name        = "${var.project_name}-aws-access-key"
+#     Environment = var.environment
+#     ManagedBy   = "Terraform"
+#   }
+# }
+#
+# resource "aws_secretsmanager_secret_version" "aws_access_key" {
+#   count = var.aws_access_key_id != "" ? 1 : 0
+#
+#   secret_id     = aws_secretsmanager_secret.aws_access_key[0].id
+#   secret_string = var.aws_access_key_id
+# }
+#
+# # AWS Secret Key (for Bedrock) - DEPRECATED
+# resource "aws_secretsmanager_secret" "aws_secret_key" {
+#   count = var.aws_secret_access_key != "" ? 1 : 0
+#
+#   name        = "${var.project_name}/aws_secret_access_key"
+#   description = "AWS Secret Access Key for Bedrock (DEPRECATED - use IAM Role)"
+#
+#   tags = {
+#     Name        = "${var.project_name}-aws-secret-key"
+#     Environment = var.environment
+#     ManagedBy   = "Terraform"
+#   }
+# }
+#
+# resource "aws_secretsmanager_secret_version" "aws_secret_key" {
+#   count = var.aws_secret_access_key != "" ? 1 : 0
+#
+#   secret_id     = aws_secretsmanager_secret.aws_secret_key[0].id
+#   secret_string = var.aws_secret_access_key
+# }

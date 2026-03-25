@@ -111,9 +111,9 @@ anthropic_api_key = ""  # sk-ant-...
 azure_api_key     = ""  # Your Azure key
 gemini_api_key    = ""  # Your Gemini key
 
-# AWS Bedrock credentials (if using)
-aws_access_key_id     = ""
-aws_secret_access_key = ""
+# AWS Bedrock access via IAM Role
+# No credentials needed! LiteLLM will automatically use the ECS Task IAM Role
+# This is more secure than using access keys
 
 # ============================================
 # Monitoring and Alerting

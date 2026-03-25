@@ -51,9 +51,7 @@ resource "aws_iam_role_policy" "ecs_task_execution_secrets_policy" {
           "${var.openai_api_key != "" ? aws_secretsmanager_secret.openai_api_key[0].arn : ""}",
           "${var.anthropic_api_key != "" ? aws_secretsmanager_secret.anthropic_api_key[0].arn : ""}",
           "${var.azure_api_key != "" ? aws_secretsmanager_secret.azure_api_key[0].arn : ""}",
-          "${var.gemini_api_key != "" ? aws_secretsmanager_secret.gemini_api_key[0].arn : ""}",
-          "${var.aws_access_key_id != "" ? aws_secretsmanager_secret.aws_access_key[0].arn : ""}",
-          "${var.aws_secret_access_key != "" ? aws_secretsmanager_secret.aws_secret_key[0].arn : ""}"
+          "${var.gemini_api_key != "" ? aws_secretsmanager_secret.gemini_api_key[0].arn : ""}"
         ]
       }
     ]
@@ -101,6 +99,37 @@ resource "aws_iam_role_policy" "ecs_task_exec_policy" {
           "ssmmessages:CreateDataChannel",
           "ssmmessages:OpenControlChannel",
           "ssmmessages:OpenDataChannel"
+        ]
+        Resource = "*"
+      }
+    ]
+  })
+}
+
+# Bedrock access policy for ECS Task Role
+# This allows LiteLLM to access Bedrock using IAM Role (no AK/SK needed)
+resource "aws_iam_role_policy" "ecs_task_bedrock_policy" {
+  name = "${var.project_name}-bedrock-access"
+  role = aws_iam_role.ecs_task_role.id
+
+  policy = jsonencode({
+    Version = "2012-10-17"
+    Statement = [
+      {
+        Sid    = "BedrockInvokeModel"
+        Effect = "Allow"
+        Action = [
+          "bedrock:InvokeModel",
+          "bedrock:InvokeModelWithResponseStream"
+        ]
+        Resource = "arn:aws:bedrock:*::foundation-model/*"
+      },
+      {
+        Sid    = "BedrockListModels"
+        Effect = "Allow"
+        Action = [
+          "bedrock:ListFoundationModels",
+          "bedrock:GetFoundationModel"
         ]
         Resource = "*"
       }

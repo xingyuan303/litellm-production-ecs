@@ -64,6 +64,7 @@ resource "aws_ecs_task_definition" "litellm_task" {
       ] : [])
 
       # Secrets from AWS Secrets Manager
+      # Note: AWS Bedrock uses IAM Role (task_role_arn) - no credentials needed!
       secrets = concat(
         var.openai_api_key != "" ? [
           {
@@ -87,16 +88,6 @@ resource "aws_ecs_task_definition" "litellm_task" {
           {
             name      = "GEMINI_API_KEY"
             valueFrom = aws_secretsmanager_secret.gemini_api_key[0].arn
-          }
-        ] : [],
-        var.aws_access_key_id != "" ? [
-          {
-            name      = "AWS_ACCESS_KEY_ID"
-            valueFrom = aws_secretsmanager_secret.aws_access_key[0].arn
-          },
-          {
-            name      = "AWS_SECRET_ACCESS_KEY"
-            valueFrom = aws_secretsmanager_secret.aws_secret_key[0].arn
           }
         ] : []
       )

@@ -2,8 +2,10 @@
 # LiteLLM Production Dockerfile
 # ============================================
 
-# Use official LiteLLM stable image as base
-FROM ghcr.io/berriai/litellm:main-stable
+# Use official LiteLLM image with locked version for security
+# Locked version prevents supply chain attacks
+# Update to latest stable version periodically: https://github.com/BerriAI/litellm/releases
+FROM ghcr.io/berriai/litellm:v1.83.0
 
 # Set working directory
 WORKDIR /app
@@ -22,5 +24,6 @@ HEALTHCHECK --interval=30s --timeout=5s --start-period=60s --retries=3 \
   CMD curl -f http://localhost:4000/health || exit 1
 
 # Start LiteLLM
-# Note: Remove --detailed_debug in production for better performance
+# Production mode (default): No detailed debug for better performance
+# Debug mode: Add --detailed_debug flag for troubleshooting
 CMD ["--port", "4000", "--config", "config.yaml"]

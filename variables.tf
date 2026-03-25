@@ -290,19 +290,23 @@ variable "gemini_api_key" {
   default     = ""
 }
 
-variable "aws_access_key_id" {
-  description = "AWS Access Key ID for Bedrock"
-  type        = string
-  sensitive   = true
-  default     = ""
-}
-
-variable "aws_secret_access_key" {
-  description = "AWS Secret Access Key for Bedrock"
-  type        = string
-  sensitive   = true
-  default     = ""
-}
+# AWS Bedrock credentials are NO LONGER NEEDED
+# LiteLLM will use the ECS Task IAM Role to access Bedrock
+# This is more secure - no long-term credentials to manage!
+#
+# variable "aws_access_key_id" {
+#   description = "AWS Access Key ID for Bedrock (DEPRECATED - use IAM Role)"
+#   type        = string
+#   sensitive   = true
+#   default     = ""
+# }
+#
+# variable "aws_secret_access_key" {
+#   description = "AWS Secret Access Key for Bedrock (DEPRECATED - use IAM Role)"
+#   type        = string
+#   sensitive   = true
+#   default     = ""
+# }
 
 # ============================================
 # Monitoring and Alerting

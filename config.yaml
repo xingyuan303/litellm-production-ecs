@@ -48,13 +48,30 @@ model_list:
   #     model: gemini/gemini-pro
   #     api_key: os.environ/GEMINI_API_KEY
 
-  # AWS Bedrock (example - uncomment and configure)
-  # - model_name: claude-bedrock
+  # AWS Bedrock (using IAM Role - no credentials needed!)
+  # Uncomment to enable Bedrock models
+  # - model_name: claude-bedrock-v2
   #   litellm_params:
   #     model: bedrock/anthropic.claude-v2
-  #     aws_access_key_id: os.environ/AWS_ACCESS_KEY_ID
-  #     aws_secret_access_key: os.environ/AWS_SECRET_ACCESS_KEY
   #     aws_region_name: us-east-1
+  #
+  # - model_name: claude-3-sonnet-bedrock
+  #   litellm_params:
+  #     model: bedrock/anthropic.claude-3-sonnet-20240229-v1:0
+  #     aws_region_name: us-east-1
+  #
+  # - model_name: claude-3-5-sonnet-bedrock
+  #   litellm_params:
+  #     model: bedrock/anthropic.claude-3-5-sonnet-20240620-v1:0
+  #     aws_region_name: us-east-1
+  #
+  # - model_name: claude-3-haiku-bedrock
+  #   litellm_params:
+  #     model: bedrock/anthropic.claude-3-haiku-20240307-v1:0
+  #     aws_region_name: us-east-1
+  #
+  # Note: No aws_access_key_id or aws_secret_access_key needed!
+  #       LiteLLM will automatically use the ECS Task IAM Role
 
 # LiteLLM settings
 litellm_settings:
