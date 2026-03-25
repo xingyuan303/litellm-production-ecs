@@ -1,0 +1,85 @@
+name: PR Comment
+
+on:
+  pull_request:
+    types: [opened, synchronize]
+
+jobs:
+  comment:
+    name: Add helpful PR comment
+    runs-on: ubuntu-latest
+    permissions:
+      pull-requests: write
+
+    steps:
+      - name: Comment on PR
+        uses: actions/github-script@v7
+        with:
+          github-token: ${{ secrets.GITHUB_TOKEN }}
+          script: |
+            // Check if we've already commented
+            const { data: comments } = await github.rest.issues.listComments({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              issue_number: context.issue.number,
+            });
+
+            const botComment = comments.find(comment =>
+              comment.user.type === 'Bot' &&
+              comment.body.includes('## 🚀 LiteLLM CI/CD Pipeline')
+            );
+
+            const body = `## 🚀 LiteLLM CI/CD Pipeline
+
+            Thanks for your contribution! Here's what will happen automatically:
+
+            ### ✅ Automated Checks
+            - **Terraform Validation**: Checking configuration syntax and formatting
+            - **Security Scan**: Running tfsec to detect security issues
+            - **Format Check**: Ensuring code follows Terraform best practices
+
+            ### 📦 After Merge
+            When this PR is merged to \`main\`:
+            - Docker image will be built automatically
+            - Security scan will run on the image
+            - Image will be pushed to ECR with tags:
+              - \`latest\`
+              - \`main-<commit-sha>\`
+
+            ### 🔧 Manual Deployment
+            After the image is built, you can deploy it using:
+            \`\`\`bash
+            # Option 1: Using the build script
+            ./build.sh
+
+            # Option 2: Manual deployment
+            aws ecs update-service \\
+              --cluster litellm-ecs-cluster \\
+              --service litellm-service \\
+              --force-new-deployment
+            \`\`\`
+
+            ### 📊 Monitoring
+            - Check workflow runs: [Actions](${context.payload.repository.html_url}/actions)
+            - View security scans: [Security](${context.payload.repository.html_url}/security)
+
+            ---
+            *🤖 This comment is automatically posted by GitHub Actions*`;
+
+            if (botComment) {
+              // Update existing comment
+              await github.rest.issues.updateComment({
+                owner: context.repo.owner,
+                repo: context.repo.repo,
+                comment_id: botComment.id,
+                body: body
+              });
+            } else {
+              // Create new comment
+              await github.rest.issues.createComment({
+                owner: context.repo.owner,
+                repo: context.repo.repo,
+                issue_number: context.issue.number,
+                body: body
+              });
+            }

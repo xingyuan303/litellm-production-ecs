@@ -1,0 +1,17 @@
+# GitHub CODEOWNERS File
+# These owners will be requested for review when someone opens a pull request
+
+# Default owners for everything in the repo
+* @xingyuan303
+
+# Terraform infrastructure files require approval
+*.tf @xingyuan303
+*.tfvars @xingyuan303
+
+# Dockerfile and build configurations
+Dockerfile @xingyuan303
+build.sh @xingyuan303
+config.yaml @xingyuan303
+
+# GitHub workflows require approval
+.github/** @xingyuan303
