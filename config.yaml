@@ -48,28 +48,34 @@ model_list:
   #     model: gemini/gemini-pro
   #     api_key: os.environ/GEMINI_API_KEY
 
-  # AWS Bedrock (using IAM Role - no credentials needed!)
-  # Active models as of 2026-03
-  - model_name: claude-sonnet-4
+  # AWS Bedrock - Global Cross-Region Inference
+  # Requests are routed to the nearest available region for better availability
+  # Latest generation models
+  - model_name: claude-opus-4-6
     litellm_params:
-      model: bedrock/anthropic.claude-sonnet-4-20250514-v1:0
+      model: bedrock/global.anthropic.claude-opus-4-6-v1
+      aws_region_name: us-east-1
+
+  - model_name: claude-sonnet-4-6
+    litellm_params:
+      model: bedrock/global.anthropic.claude-sonnet-4-6
       aws_region_name: us-east-1
 
   - model_name: claude-haiku-4-5
     litellm_params:
-      model: bedrock/anthropic.claude-haiku-4-5-20251001-v1:0
+      model: bedrock/global.anthropic.claude-haiku-4-5-20251001-v1:0
       aws_region_name: us-east-1
 
-  # Optional: Additional Bedrock models (uncomment to enable)
-  # - model_name: claude-sonnet-4-5
-  #   litellm_params:
-  #     model: bedrock/anthropic.claude-sonnet-4-5-20250929-v1:0
-  #     aws_region_name: us-east-1
-  #
-  # - model_name: claude-opus-4
-  #   litellm_params:
-  #     model: bedrock/anthropic.claude-opus-4-6-v1
-  #     aws_region_name: us-east-1
+  # Previous generation models (still available)
+  - model_name: claude-opus-4-5
+    litellm_params:
+      model: bedrock/global.anthropic.claude-opus-4-5-20251101-v1:0
+      aws_region_name: us-east-1
+
+  - model_name: claude-sonnet-4-5
+    litellm_params:
+      model: bedrock/global.anthropic.claude-sonnet-4-5-20250929-v1:0
+      aws_region_name: us-east-1
   
   # Note: No aws_access_key_id or aws_secret_access_key needed!
   #       LiteLLM will automatically use the ECS Task IAM Role
