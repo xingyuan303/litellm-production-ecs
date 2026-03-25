@@ -52,7 +52,7 @@ resource "aws_db_subnet_group" "litellm_db_subnet_group" {
 # RDS Parameter Group (optimized for LiteLLM)
 resource "aws_db_parameter_group" "litellm_pg" {
   name   = "${var.project_name}-pg-params"
-  family = "postgres16"
+  family = "postgres17"
 
   # Connection settings
   parameter {
