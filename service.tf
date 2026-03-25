@@ -33,15 +33,13 @@ resource "aws_ecs_service" "litellm_service" {
   }
 
   # Deployment configuration
-  deployment_configuration {
-    maximum_percent         = 200  # Allow 2x capacity during deployment
-    minimum_healthy_percent = 100  # Maintain full capacity during deployment
+    deployment_maximum_percent = 200
+    deployment_minimum_healthy_percent = 100
 
     deployment_circuit_breaker {
       enable   = true   # Enable circuit breaker
       rollback = true   # Auto-rollback on failure
     }
-  }
 
   # Health check grace period
   health_check_grace_period_seconds = 300

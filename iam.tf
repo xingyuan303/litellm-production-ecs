@@ -46,13 +46,13 @@ resource "aws_iam_role_policy" "ecs_task_execution_secrets_policy" {
           "secretsmanager:GetSecretValue",
           "secretsmanager:DescribeSecret"
         ]
-        Resource = [
+        Resource = compact([
           aws_secretsmanager_secret.db_password.arn,
-          "${var.openai_api_key != "" ? aws_secretsmanager_secret.openai_api_key[0].arn : ""}",
-          "${var.anthropic_api_key != "" ? aws_secretsmanager_secret.anthropic_api_key[0].arn : ""}",
-          "${var.azure_api_key != "" ? aws_secretsmanager_secret.azure_api_key[0].arn : ""}",
-          "${var.gemini_api_key != "" ? aws_secretsmanager_secret.gemini_api_key[0].arn : ""}"
-        ]
+          var.openai_api_key != "" ? aws_secretsmanager_secret.openai_api_key[0].arn : "",
+          var.anthropic_api_key != "" ? aws_secretsmanager_secret.anthropic_api_key[0].arn : "",
+          var.azure_api_key != "" ? aws_secretsmanager_secret.azure_api_key[0].arn : "",
+          var.gemini_api_key != "" ? aws_secretsmanager_secret.gemini_api_key[0].arn : ""
+        ])
       }
     ]
   })

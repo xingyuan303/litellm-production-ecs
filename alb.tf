@@ -127,6 +127,8 @@ resource "aws_lb_target_group" "litellm_tg" {
 
 # HTTP Listener - Redirect to HTTPS
 resource "aws_lb_listener" "litellm_http" {
+  count = var.enable_https ? 1 : 0
+
   load_balancer_arn = aws_lb.litellm_alb.arn
   port              = "80"
   protocol          = "HTTP"

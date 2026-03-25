@@ -5,34 +5,34 @@
 # Model definitions
 model_list:
   # OpenAI GPT-4
-  - model_name: gpt-4
-    litellm_params:
-      model: openai/gpt-4
-      api_key: os.environ/OPENAI_API_KEY
+  #- model_name: gpt-4
+  #  litellm_params:
+  #    model: openai/gpt-4
+  #    api_key: os.environ/OPENAI_API_KEY
 
   # OpenAI GPT-4 Turbo
-  - model_name: gpt-4-turbo
-    litellm_params:
-      model: openai/gpt-4-turbo-preview
-      api_key: os.environ/OPENAI_API_KEY
+ # - model_name: gpt-4-turbo
+ #   litellm_params:
+ #     model: openai/gpt-4-turbo-preview
+ #     api_key: os.environ/OPENAI_API_KEY
 
   # OpenAI GPT-3.5 Turbo
-  - model_name: gpt-3.5-turbo
-    litellm_params:
-      model: openai/gpt-3.5-turbo
-      api_key: os.environ/OPENAI_API_KEY
+  #- model_name: gpt-3.5-turbo
+  #  litellm_params:
+  #    model: openai/gpt-3.5-turbo
+  #    api_key: os.environ/OPENAI_API_KEY
 
-  # Anthropic Claude Sonnet
-  - model_name: claude-sonnet-4
-    litellm_params:
-      model: anthropic/claude-sonnet-4-20250514
-      api_key: os.environ/ANTHROPIC_API_KEY
+  ## Anthropic Claude Sonnet
+  #- model_name: claude-sonnet-4
+  #  litellm_params:
+  #    model: anthropic/claude-sonnet-4-20250514
+  #    api_key: os.environ/ANTHROPIC_API_KEY
 
-  # Anthropic Claude Opus
-  - model_name: claude-opus-4
-    litellm_params:
-      model: anthropic/claude-opus-4-20250514
-      api_key: os.environ/ANTHROPIC_API_KEY
+  ## Anthropic Claude Opus
+  #- model_name: claude-opus-4
+  #  litellm_params:
+  #    model: anthropic/claude-opus-4-20250514
+  #    api_key: os.environ/ANTHROPIC_API_KEY
 
   # Azure OpenAI (example - uncomment and configure)
   # - model_name: gpt-35-turbo-azure
@@ -50,26 +50,16 @@ model_list:
 
   # AWS Bedrock (using IAM Role - no credentials needed!)
   # Uncomment to enable Bedrock models
-  # - model_name: claude-bedrock-v2
-  #   litellm_params:
-  #     model: bedrock/anthropic.claude-v2
-  #     aws_region_name: us-east-1
-  #
-  # - model_name: claude-3-sonnet-bedrock
-  #   litellm_params:
-  #     model: bedrock/anthropic.claude-3-sonnet-20240229-v1:0
-  #     aws_region_name: us-east-1
-  #
-  # - model_name: claude-3-5-sonnet-bedrock
-  #   litellm_params:
-  #     model: bedrock/anthropic.claude-3-5-sonnet-20240620-v1:0
-  #     aws_region_name: us-east-1
-  #
-  # - model_name: claude-3-haiku-bedrock
-  #   litellm_params:
-  #     model: bedrock/anthropic.claude-3-haiku-20240307-v1:0
-  #     aws_region_name: us-east-1
-  #
+   - model_name: claude-3-5-sonnet-bedrock
+     litellm_params:
+       model: bedrock/anthropic.claude-3-5-sonnet-20240620-v1:0
+       aws_region_name: us-east-1
+  
+   - model_name: claude-3-haiku-bedrock
+     litellm_params:
+       model: bedrock/anthropic.claude-3-haiku-20240307-v1:0
+       aws_region_name: us-east-1
+  
   # Note: No aws_access_key_id or aws_secret_access_key needed!
   #       LiteLLM will automatically use the ECS Task IAM Role
 

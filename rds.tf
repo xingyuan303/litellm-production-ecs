@@ -56,20 +56,23 @@ resource "aws_db_parameter_group" "litellm_pg" {
 
   # Connection settings
   parameter {
-    name  = "max_connections"
-    value = "200"
+    name         = "max_connections"
+    value        = "200"
+    apply_method = "pending-reboot"
   }
 
   # Memory settings
   parameter {
-    name  = "shared_buffers"
-    value = "{DBInstanceClassMemory/4096}" # 25% of available memory
+    name         = "shared_buffers"
+    value        = "{DBInstanceClassMemory/4096}" # 25% of available memory
+    apply_method = "pending-reboot"
   }
 
   # WAL settings for better performance
   parameter {
-    name  = "wal_buffers"
-    value = "2048"
+    name         = "wal_buffers"
+    value        = "2048"
+    apply_method = "pending-reboot"
   }
 
   # Logging (can be adjusted based on needs)
