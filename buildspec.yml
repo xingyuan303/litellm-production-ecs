@@ -1,0 +1,27 @@
+version: 0.2
+
+phases:
+  pre_build:
+    commands:
+      - echo Logging in to Amazon ECR...
+      - aws ecr get-login-password --region $AWS_DEFAULT_REGION | docker login --username AWS --password-stdin $ECR_REPOSITORY_URL
+      - COMMIT_HASH=$(echo $CODEBUILD_RESOLVED_SOURCE_VERSION | cut -c 1-7)
+      - IMAGE_TAG=${COMMIT_HASH:=latest}
+  build:
+    commands:
+      - echo Build started on `date`
+      - echo Building the Docker image...
+      - docker build -t $ECR_REPOSITORY_URL:latest -t $ECR_REPOSITORY_URL:$IMAGE_TAG .
+      - echo Build completed on `date`
+  post_build:
+    commands:
+      - echo Pushing the Docker images...
+      - docker push $ECR_REPOSITORY_URL:latest
+      - docker push $ECR_REPOSITORY_URL:$IMAGE_TAG
+      - echo Writing image definitions file...
+      - printf '[{"name":"litellm","imageUri":"%s"}]' $ECR_REPOSITORY_URL:latest > imagedefinitions.json
+      - echo Updating ECS service...
+      - aws ecs update-service --cluster $ECS_CLUSTER_NAME --service $ECS_SERVICE_NAME --force-new-deployment --region $AWS_DEFAULT_REGION
+
+artifacts:
+  files: imagedefinitions.json

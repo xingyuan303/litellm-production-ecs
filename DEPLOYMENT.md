@@ -640,7 +640,7 @@ TASK_IP=$(aws ecs describe-tasks \
   --query 'tasks[0].attachments[0].details[?name==`privateIPv4Address`].value' \
   --output text)
 
-curl http://$TASK_IP:4000/health
+curl http://$TASK_IP:4000/health/readiness
 ```
 
 ### 问题 3: 数据库连接失败

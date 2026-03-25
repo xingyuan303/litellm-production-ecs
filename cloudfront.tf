@@ -72,7 +72,7 @@ resource "aws_cloudfront_distribution" "litellm" {
 
   # 针对健康检查端点的缓存策略（可缓存）
   ordered_cache_behavior {
-    path_pattern           = "/health"
+    path_pattern           = "/health/*"
     target_origin_id       = "ALB-${var.project_name}"
     viewer_protocol_policy = "allow-all"
 

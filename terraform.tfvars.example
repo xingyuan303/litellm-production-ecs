@@ -49,7 +49,7 @@ scheduled_scale_down_max = 4
 # ============================================
 
 db_instance_class       = "db.t3.medium"
-db_engine_version       = "16.4"
+db_engine_version       = "16.13"
 db_allocated_storage    = 100
 db_max_allocated_storage = 500
 
@@ -88,11 +88,13 @@ enable_health_check = false
 # LiteLLM Configuration
 # ============================================
 
-# IMPORTANT: Generate secure keys before deploying
-# Example: openssl rand -hex 32
+# IMPORTANT: Generate secure keys before deploying!
+# Run these commands to generate:
+#   Master Key: echo "sk-$(openssl rand -hex 16)"
+#   Salt Key:   openssl rand -hex 32
 
-litellm_master_key = "sk-your-master-key-here"
-litellm_salt_key   = "your-salt-key-here"
+litellm_master_key = "sk-CHANGE-ME-GENERATE-YOUR-OWN-KEY"
+litellm_salt_key   = "CHANGE-ME-RUN-openssl-rand-hex-32-TO-GENERATE"
 
 litellm_log_level = "INFO"
 

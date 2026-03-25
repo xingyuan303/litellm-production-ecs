@@ -96,7 +96,7 @@ resource "aws_route53_health_check" "litellm" {
   fqdn              = var.litellm_subdomain
   port              = 443
   type              = "HTTPS"
-  resource_path     = "/health"
+  resource_path     = "/health/readiness"
   failure_threshold = 3
   request_interval  = 30
 

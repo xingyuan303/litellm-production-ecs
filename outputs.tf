@@ -214,7 +214,7 @@ output "quick_start_commands" {
        --region ${var.aws_region}
 
   7. Test Health Endpoint:
-     curl ${var.enable_https ? "https://${var.litellm_subdomain}" : "http://${aws_lb.litellm_alb.dns_name}"}/health
+     curl ${var.enable_https ? "https://${var.litellm_subdomain}" : "http://${aws_lb.litellm_alb.dns_name}"}/health/readiness
 
   8. Test API (replace <your-key> with actual key):
      curl ${var.enable_https ? "https://${var.litellm_subdomain}" : "http://${aws_lb.litellm_alb.dns_name}"}/v1/models \\
@@ -236,6 +236,49 @@ output "database_connection_env" {
     value = "postgresql://${var.db_username}:${random_password.db_password.result}@${aws_db_instance.litellm_db.endpoint}/${var.db_name}"
   }
   sensitive = true
+}
+
+# ============================================
+# Outputs - Project Configuration
+# ============================================
+
+output "project_name" {
+  description = "Project name"
+  value       = var.project_name
+}
+
+output "aws_region" {
+  description = "AWS region"
+  value       = var.aws_region
+}
+
+output "environment" {
+  description = "Environment name"
+  value       = var.environment
+}
+
+# ============================================
+# Outputs - Network Information
+# ============================================
+
+output "vpc_id" {
+  description = "VPC ID"
+  value       = aws_default_vpc.default_vpc.id
+}
+
+output "default_subnet_az1_id" {
+  description = "Subnet ID for availability zone 1"
+  value       = aws_default_subnet.ecs_az1.id
+}
+
+output "default_subnet_az2_id" {
+  description = "Subnet ID for availability zone 2"
+  value       = aws_default_subnet.ecs_az2.id
+}
+
+output "default_subnet_az3_id" {
+  description = "Subnet ID for availability zone 3"
+  value       = aws_default_subnet.ecs_az3.id
 }
 
 # ============================================

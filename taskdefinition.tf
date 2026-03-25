@@ -39,7 +39,7 @@ resource "aws_ecs_task_definition" "litellm_task" {
         },
         {
           name  = "DATABASE_URL"
-          value = "postgresql://${var.db_username}:${random_password.db_password.result}@${aws_db_instance.litellm_db.endpoint}/${var.db_name}"
+          value = "postgresql://${var.db_username}:${urlencode(random_password.db_password.result)}@${aws_db_instance.litellm_db.address}:${aws_db_instance.litellm_db.port}/${var.db_name}"
         },
         {
           name  = "LOG_LEVEL"
@@ -94,7 +94,7 @@ resource "aws_ecs_task_definition" "litellm_task" {
 
       # Health check
       healthCheck = {
-        command     = ["CMD-SHELL", "curl -f http://localhost:4000/health || exit 1"]
+        command     = ["CMD-SHELL", "curl -f http://localhost:4000/health/readiness || exit 1"]
         interval    = 30
         timeout     = 5
         retries     = 3
