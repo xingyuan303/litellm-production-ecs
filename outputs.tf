@@ -49,7 +49,7 @@ output "rds_port" {
 
 output "database_url" {
   description = "PostgreSQL connection string for LiteLLM"
-  value       = "postgresql://${var.db_username}:${random_password.db_password.result}@${aws_db_instance.litellm_db.endpoint}/${var.db_name}"
+  value       = "postgresql://${var.db_username}:${urlencode(random_password.db_password.result)}@${aws_db_instance.litellm_db.address}:${aws_db_instance.litellm_db.port}/${var.db_name}"
   sensitive   = true
 }
 
@@ -233,7 +233,7 @@ output "database_connection_env" {
   description = "Database connection string formatted for ECS environment variable"
   value = {
     name  = "DATABASE_URL"
-    value = "postgresql://${var.db_username}:${random_password.db_password.result}@${aws_db_instance.litellm_db.endpoint}/${var.db_name}"
+    value = "postgresql://${var.db_username}:${urlencode(random_password.db_password.result)}@${aws_db_instance.litellm_db.address}:${aws_db_instance.litellm_db.port}/${var.db_name}"
   }
   sensitive = true
 }
