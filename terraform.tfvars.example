@@ -11,6 +11,10 @@ aws_region   = "us-east-1"
 # Enable/Disable deletion protection for production
 enable_deletion_protection = true
 
+# IP whitelist for ALB access (use ["0.0.0.0/0"] to allow all)
+# Example: ["1.2.3.4/32", "10.0.0.0/8"]
+allowed_cidrs = ["0.0.0.0/0"]
+
 # ============================================
 # ECS Configuration
 # ============================================

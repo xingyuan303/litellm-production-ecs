@@ -26,6 +26,12 @@ variable "enable_deletion_protection" {
   default     = true
 }
 
+variable "allowed_cidrs" {
+  description = "List of CIDR blocks allowed to access the ALB (e.g. [\"1.2.3.4/32\", \"10.0.0.0/8\"]). Use [\"0.0.0.0/0\"] to allow all."
+  type        = list(string)
+  default     = ["0.0.0.0/0"]
+}
+
 # ============================================
 # ECS Configuration
 # ============================================
