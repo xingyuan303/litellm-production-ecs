@@ -325,6 +325,88 @@ variable "cloudwatch_log_retention_days" {
 }
 
 # ============================================
+# CloudFront Configuration
+# ============================================
+
+variable "enable_cloudfront" {
+  description = "Enable CloudFront CDN for global acceleration"
+  type        = bool
+  default     = false
+}
+
+variable "cloudfront_price_class" {
+  description = "CloudFront price class (PriceClass_All, PriceClass_200, PriceClass_100)"
+  type        = string
+  default     = "PriceClass_All"
+}
+
+variable "cloudfront_custom_domain" {
+  description = "Custom domain for CloudFront (optional, requires Route53 and enable_https)"
+  type        = string
+  default     = ""
+}
+
+variable "cloudfront_logging_bucket" {
+  description = "S3 bucket for CloudFront access logs (optional)"
+  type        = string
+  default     = ""
+}
+
+variable "enable_waf" {
+  description = "Enable AWS WAF for CloudFront"
+  type        = bool
+  default     = false
+}
+
+variable "waf_rate_limit" {
+  description = "Rate limit for WAF (requests per 5 minutes per IP)"
+  type        = number
+  default     = 2000
+}
+
+variable "cloudfront_allowed_methods" {
+  description = "HTTP methods allowed by CloudFront"
+  type        = list(string)
+  default     = ["DELETE", "GET", "HEAD", "OPTIONS", "PATCH", "POST", "PUT"]
+}
+
+variable "cloudfront_cached_methods" {
+  description = "HTTP methods cached by CloudFront"
+  type        = list(string)
+  default     = ["GET", "HEAD", "OPTIONS"]
+}
+
+variable "cloudfront_min_ttl" {
+  description = "Minimum TTL for CloudFront cache (seconds)"
+  type        = number
+  default     = 0
+}
+
+variable "cloudfront_default_ttl" {
+  description = "Default TTL for CloudFront cache (seconds)"
+  type        = number
+  default     = 0
+}
+
+variable "cloudfront_max_ttl" {
+  description = "Maximum TTL for CloudFront cache (seconds)"
+  type        = number
+  default     = 0
+}
+
+variable "cloudfront_geo_restriction_type" {
+  description = "Geo restriction type (none, whitelist, blacklist)"
+  type        = string
+  default     = "none"
+}
+
+variable "cloudfront_geo_restriction_locations" {
+  description = "Country codes for geo restriction"
+  type        = list(string)
+  default     = []
+}
+
+# ============================================
 # Tags
 # ============================================
 

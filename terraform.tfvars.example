@@ -129,6 +129,82 @@ alarm_sns_topic_arn = ""
 cloudwatch_log_retention_days = 7
 
 # ============================================
+# CloudFront Configuration (Optional)
+# ============================================
+
+# Enable CloudFront CDN for global acceleration
+# Recommended for: Asia, Europe, and other regions far from ALB
+enable_cloudfront = false
+
+# CloudFront price class
+# - PriceClass_All: All edge locations (best performance, highest cost)
+# - PriceClass_200: US, Europe, Asia, Middle East, Africa (recommended)
+# - PriceClass_100: US and Europe only (lowest cost)
+cloudfront_price_class = "PriceClass_All"
+
+# ============================================
+# Option 1: CloudFront with Default Domain
+# ============================================
+#
+# If you just want CloudFront acceleration without custom domain:
+# 1. Set enable_cloudfront = true
+# 2. Leave cloudfront_custom_domain = ""
+# 3. Access via: https://d111111abcdef8.cloudfront.net
+#
+# No Route53 or additional certificate needed!
+
+# ============================================
+# Option 2: CloudFront with Custom Domain
+# ============================================
+#
+# If you want a custom domain for CloudFront:
+# 1. Set enable_cloudfront = true
+# 2. Set enable_https = true
+# 3. Set domain_name (your root domain)
+# 4. Set cloudfront_custom_domain (your CloudFront subdomain)
+# 5. CloudFront certificate will be created in us-east-1 automatically
+#
+# Example:
+# enable_cloudfront       = true
+# enable_https            = true
+# domain_name             = "example.com"
+# cloudfront_custom_domain = "api.example.com"
+#
+# Access via: https://api.example.com
+
+cloudfront_custom_domain = ""
+
+# CloudFront logging (optional)
+# Create an S3 bucket first for CloudFront logs
+# cloudfront_logging_bucket = "my-cloudfront-logs-bucket"
+cloudfront_logging_bucket = ""
+
+# ============================================
+# AWS WAF Configuration (Optional)
+# ============================================
+
+# Enable WAF for DDoS protection and rate limiting
+enable_waf = false
+
+# Rate limit (requests per 5 minutes per IP)
+waf_rate_limit = 2000
+
+# Geo restriction (optional)
+# - "none": No restrictions (default)
+# - "whitelist": Only allow specified countries
+# - "blacklist": Block specified countries
+cloudfront_geo_restriction_type = "none"
+
+# Country codes for geo restriction (ISO 3166-1 alpha-2)
+# Example: ["US", "CN", "JP", "SG", "KR"]
+cloudfront_geo_restriction_locations = []
+
+# Cache TTL settings (for API, keep at 0 to disable caching)
+cloudfront_min_ttl     = 0
+cloudfront_default_ttl = 0
+cloudfront_max_ttl     = 0
+
+# ============================================
 # Additional Tags
 # ============================================
 

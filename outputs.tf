@@ -237,3 +237,51 @@ output "database_connection_env" {
   }
   sensitive = true
 }
+
+# ============================================
+# Outputs - CloudFront (if enabled)
+# ============================================
+
+output "cloudfront_distribution_id" {
+  description = "CloudFront Distribution ID"
+  value       = var.enable_cloudfront ? aws_cloudfront_distribution.litellm[0].id : "CloudFront not enabled"
+}
+
+output "cloudfront_distribution_arn" {
+  description = "CloudFront Distribution ARN"
+  value       = var.enable_cloudfront ? aws_cloudfront_distribution.litellm[0].arn : "CloudFront not enabled"
+}
+
+output "cloudfront_domain_name" {
+  description = "CloudFront Distribution Domain Name (default)"
+  value       = var.enable_cloudfront ? aws_cloudfront_distribution.litellm[0].domain_name : "CloudFront not enabled"
+}
+
+output "cloudfront_url" {
+  description = "CloudFront URL (using default domain)"
+  value       = var.enable_cloudfront ? "https://${aws_cloudfront_distribution.litellm[0].domain_name}" : "CloudFront not enabled"
+}
+
+output "cloudfront_custom_domain_url" {
+  description = "CloudFront Custom Domain URL (if configured)"
+  value       = var.enable_cloudfront && var.cloudfront_custom_domain != "" ? "https://${var.cloudfront_custom_domain}" : "CloudFront custom domain not configured"
+}
+
+output "cloudfront_certificate_arn" {
+  description = "ARN of the CloudFront ACM certificate (us-east-1)"
+  value       = var.enable_cloudfront && var.cloudfront_custom_domain != "" && var.enable_https ? aws_acm_certificate.cloudfront_cert[0].arn : "CloudFront custom domain not configured"
+}
+
+output "waf_web_acl_id" {
+  description = "WAF Web ACL ID (if enabled)"
+  value       = var.enable_cloudfront && var.enable_waf ? aws_wafv2_web_acl.litellm[0].id : "WAF not enabled"
+}
+
+output "recommended_access_url" {
+  description = "Recommended URL to access LiteLLM (prefers CloudFront custom domain > CloudFront default > ALB custom > ALB direct)"
+  value = var.enable_cloudfront && var.cloudfront_custom_domain != "" ? "https://${var.cloudfront_custom_domain}" : (
+    var.enable_cloudfront ? "https://${aws_cloudfront_distribution.litellm[0].domain_name}" : (
+      var.enable_https ? "https://${var.litellm_subdomain}" : "http://${aws_lb.litellm_alb.dns_name}"
+    )
+  )
+}

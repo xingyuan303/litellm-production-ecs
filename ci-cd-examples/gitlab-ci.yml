@@ -1,0 +1,69 @@
+# ============================================
+# GitLab CI/CD Pipeline for LiteLLM
+# ============================================
+# 使用方法：将此文件复制为 .gitlab-ci.yml
+#
+# 需要在 GitLab CI/CD Variables 中设置：
+# - AWS_ACCESS_KEY_ID
+# - AWS_SECRET_ACCESS_KEY
+# - AWS_REGION (默认: us-east-1)
+# ============================================
+
+stages:
+  - build
+  - deploy
+
+variables:
+  AWS_DEFAULT_REGION: ${AWS_REGION:-us-east-1}
+  DOCKER_DRIVER: overlay2
+  DOCKER_TLS_CERTDIR: "/certs"
+
+# Docker 构建和推送
+build-and-push:
+  stage: build
+  image: docker:24-dind
+  services:
+    - docker:24-dind
+  before_script:
+    # 安装 AWS CLI
+    - apk add --no-cache aws-cli bash
+    # 登录 ECR
+    - aws ecr get-login-password --region $AWS_DEFAULT_REGION | docker login --username AWS --password-stdin $(aws sts get-caller-identity --query Account --output text).dkr.ecr.$AWS_DEFAULT_REGION.amazonaws.com
+  script:
+    # 构建镜像
+    - docker build -t litellm:$CI_COMMIT_SHORT_SHA .
+    - docker tag litellm:$CI_COMMIT_SHORT_SHA $(aws ecr describe-repositories --repository-names litellm-dev --query 'repositories[0].repositoryUri' --output text):latest
+    - docker tag litellm:$CI_COMMIT_SHORT_SHA $(aws ecr describe-repositories --repository-names litellm-dev --query 'repositories[0].repositoryUri' --output text):$CI_COMMIT_SHORT_SHA
+    # 推送到 ECR
+    - docker push $(aws ecr describe-repositories --repository-names litellm-dev --query 'repositories[0].repositoryUri' --output text):latest
+    - docker push $(aws ecr describe-repositories --repository-names litellm-dev --query 'repositories[0].repositoryUri' --output text):$CI_COMMIT_SHORT_SHA
+  only:
+    - main
+    - develop
+
+# 部署到 ECS
+deploy-ecs:
+  stage: deploy
+  image: amazon/aws-cli:latest
+  script:
+    # 强制 ECS 服务更新
+    - aws ecs update-service --cluster litellm-ecs-cluster --service litellm-service --force-new-deployment --region $AWS_DEFAULT_REGION
+    # 等待部署完成
+    - aws ecs wait services-stable --cluster litellm-ecs-cluster --services litellm-service --region $AWS_DEFAULT_REGION
+  only:
+    - main
+  needs:
+    - build-and-push
+
+# 或者使用项目自带的 build.sh（更简单）
+deploy-with-script:
+  stage: deploy
+  image: amazon/aws-cli:latest
+  before_script:
+    - yum install -y docker
+  script:
+    - chmod +x ./build.sh
+    - ./build.sh $AWS_DEFAULT_REGION default
+  only:
+    - main
+  when: manual
