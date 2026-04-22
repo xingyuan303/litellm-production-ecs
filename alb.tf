@@ -2,28 +2,62 @@
 # Application Load Balancer Configuration
 # ============================================
 
+# CloudFront managed prefix list (used to restrict ALB access)
+data "aws_ec2_managed_prefix_list" "cloudfront" {
+  count = var.enable_cloudfront ? 1 : 0
+  name  = "com.amazonaws.global.cloudfront.origin-facing"
+}
+
 # Security Group for ALB
 resource "aws_security_group" "alb_sg" {
   name        = "${var.project_name}-alb-sg"
   description = "Security group for LiteLLM Application Load Balancer"
   vpc_id      = aws_default_vpc.default_vpc.id
 
-  # Allow HTTP traffic from allowed CIDRs
-  ingress {
-    description = "HTTP from allowed CIDRs"
-    from_port   = 80
-    to_port     = 80
-    protocol    = "tcp"
-    cidr_blocks = var.allowed_cidrs
+  # When CloudFront is enabled, only allow traffic from CloudFront
+  dynamic "ingress" {
+    for_each = var.enable_cloudfront ? [80] : []
+    content {
+      description     = "HTTP from CloudFront only"
+      from_port       = ingress.value
+      to_port         = ingress.value
+      protocol        = "tcp"
+      prefix_list_ids = [data.aws_ec2_managed_prefix_list.cloudfront[0].id]
+    }
   }
 
-  # Allow HTTPS traffic from allowed CIDRs
-  ingress {
-    description = "HTTPS from allowed CIDRs"
-    from_port   = 443
-    to_port     = 443
-    protocol    = "tcp"
-    cidr_blocks = var.allowed_cidrs
+  dynamic "ingress" {
+    for_each = var.enable_cloudfront && var.enable_https ? [443] : []
+    content {
+      description     = "HTTPS from CloudFront only"
+      from_port       = ingress.value
+      to_port         = ingress.value
+      protocol        = "tcp"
+      prefix_list_ids = [data.aws_ec2_managed_prefix_list.cloudfront[0].id]
+    }
+  }
+
+  # When CloudFront is disabled, allow from specified CIDRs (fallback)
+  dynamic "ingress" {
+    for_each = var.enable_cloudfront ? [] : [80]
+    content {
+      description = "HTTP from allowed CIDRs"
+      from_port   = ingress.value
+      to_port     = ingress.value
+      protocol    = "tcp"
+      cidr_blocks = var.allowed_cidrs
+    }
+  }
+
+  dynamic "ingress" {
+    for_each = !var.enable_cloudfront && var.enable_https ? [443] : []
+    content {
+      description = "HTTPS from allowed CIDRs"
+      from_port   = ingress.value
+      to_port     = ingress.value
+      protocol    = "tcp"
+      cidr_blocks = var.allowed_cidrs
+    }
   }
 
   # Allow all outbound traffic
@@ -160,8 +194,18 @@ resource "aws_lb_listener" "litellm_https" {
   certificate_arn   = var.enable_https ? aws_acm_certificate.litellm_cert[0].arn : null
 
   default_action {
-    type             = "forward"
-    target_group_arn = aws_lb_target_group.litellm_tg.arn
+    type = var.enable_cloudfront ? "fixed-response" : "forward"
+
+    dynamic "fixed_response" {
+      for_each = var.enable_cloudfront ? [1] : []
+      content {
+        content_type = "text/plain"
+        message_body = "Forbidden"
+        status_code  = "403"
+      }
+    }
+
+    target_group_arn = var.enable_cloudfront ? null : aws_lb_target_group.litellm_tg.arn
   }
 
   depends_on = [aws_acm_certificate_validation.litellm_cert]
@@ -172,7 +216,28 @@ resource "aws_lb_listener" "litellm_https" {
   }
 }
 
-# HTTP Listener without HTTPS redirect (for testing)
+# HTTPS Listener rule to validate CloudFront secret header
+resource "aws_lb_listener_rule" "cloudfront_validated_https" {
+  count = var.enable_cloudfront && var.enable_https ? 1 : 0
+
+  listener_arn = aws_lb_listener.litellm_https[0].arn
+  priority     = 1
+
+  action {
+    type             = "forward"
+    target_group_arn = aws_lb_target_group.litellm_tg.arn
+  }
+
+  condition {
+    http_header {
+      http_header_name = "X-CloudFront-Secret"
+      values           = [random_password.cloudfront_secret[0].result]
+    }
+  }
+}
+
+# HTTP Listener - when CloudFront is enabled, default action returns 403
+# Only requests with valid CloudFront secret header are forwarded
 resource "aws_lb_listener" "litellm_http_forward" {
   count = var.enable_https ? 0 : 1
 
@@ -181,12 +246,42 @@ resource "aws_lb_listener" "litellm_http_forward" {
   protocol          = "HTTP"
 
   default_action {
-    type             = "forward"
-    target_group_arn = aws_lb_target_group.litellm_tg.arn
+    type = var.enable_cloudfront ? "fixed-response" : "forward"
+
+    dynamic "fixed_response" {
+      for_each = var.enable_cloudfront ? [1] : []
+      content {
+        content_type = "text/plain"
+        message_body = "Forbidden"
+        status_code  = "403"
+      }
+    }
+
+    target_group_arn = var.enable_cloudfront ? null : aws_lb_target_group.litellm_tg.arn
   }
 
   tags = {
     Name        = "${var.project_name}-http-listener"
     Environment = var.environment
+  }
+}
+
+# Listener rule to validate CloudFront secret header and forward to target group
+resource "aws_lb_listener_rule" "cloudfront_validated" {
+  count = var.enable_cloudfront && !var.enable_https ? 1 : 0
+
+  listener_arn = aws_lb_listener.litellm_http_forward[0].arn
+  priority     = 1
+
+  action {
+    type             = "forward"
+    target_group_arn = aws_lb_target_group.litellm_tg.arn
+  }
+
+  condition {
+    http_header {
+      http_header_name = "X-CloudFront-Secret"
+      values           = [random_password.cloudfront_secret[0].result]
+    }
   }
 }

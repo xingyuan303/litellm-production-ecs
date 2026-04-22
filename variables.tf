@@ -335,9 +335,9 @@ variable "cloudwatch_log_retention_days" {
 # ============================================
 
 variable "enable_cloudfront" {
-  description = "Enable CloudFront CDN for global acceleration"
+  description = "Enable CloudFront CDN for global acceleration. When enabled, ALB is restricted to CloudFront traffic only."
   type        = bool
-  default     = false
+  default     = true
 }
 
 variable "cloudfront_price_class" {

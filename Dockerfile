@@ -13,9 +13,6 @@ WORKDIR /app
 # Copy configuration file
 COPY config.yaml /app/config.yaml
 
-# Make entrypoint executable
-RUN chmod +x ./docker/entrypoint.sh
-
 # Expose LiteLLM port
 EXPOSE 4000
 
