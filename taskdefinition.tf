@@ -31,15 +31,11 @@ resource "aws_ecs_task_definition" "litellm_task" {
         }
       ]
 
-      # Environment variables
-      environment = concat([
+      # Environment variables (non-sensitive only)
+      environment = [
         {
           name  = "PORT"
           value = "4000"
-        },
-        {
-          name  = "DATABASE_URL"
-          value = "postgresql://${var.db_username}:${urlencode(random_password.db_password.result)}@${aws_db_instance.litellm_db.address}:${aws_db_instance.litellm_db.port}/${var.db_name}"
         },
         {
           name  = "LOG_LEVEL"
@@ -49,23 +45,28 @@ resource "aws_ecs_task_definition" "litellm_task" {
           name  = "AWS_REGION"
           value = var.aws_region
         }
-      ],
-      var.litellm_master_key != "" ? [
-        {
-          name  = "LITELLM_MASTER_KEY"
-          value = var.litellm_master_key
-        }
-      ] : [],
-      var.litellm_salt_key != "" ? [
-        {
-          name  = "LITELLM_SALT_KEY"
-          value = var.litellm_salt_key
-        }
-      ] : [])
+      ]
 
       # Secrets from AWS Secrets Manager
-      # Note: AWS Bedrock uses IAM Role (task_role_arn) - no credentials needed!
       secrets = concat(
+        [
+          {
+            name      = "DATABASE_URL"
+            valueFrom = aws_secretsmanager_secret.database_url.arn
+          }
+        ],
+        var.litellm_master_key != "" ? [
+          {
+            name      = "LITELLM_MASTER_KEY"
+            valueFrom = aws_secretsmanager_secret.litellm_master_key[0].arn
+          }
+        ] : [],
+        var.litellm_salt_key != "" ? [
+          {
+            name      = "LITELLM_SALT_KEY"
+            valueFrom = aws_secretsmanager_secret.litellm_salt_key[0].arn
+          }
+        ] : [],
         var.openai_api_key != "" ? [
           {
             name      = "OPENAI_API_KEY"

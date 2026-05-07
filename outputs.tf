@@ -263,22 +263,17 @@ output "environment" {
 
 output "vpc_id" {
   description = "VPC ID"
-  value       = aws_default_vpc.default_vpc.id
+  value       = aws_vpc.main.id
 }
 
-output "default_subnet_az1_id" {
-  description = "Subnet ID for availability zone 1"
-  value       = aws_default_subnet.ecs_az1.id
+output "public_subnet_ids" {
+  description = "Public subnet IDs (ALB)"
+  value       = aws_subnet.public[*].id
 }
 
-output "default_subnet_az2_id" {
-  description = "Subnet ID for availability zone 2"
-  value       = aws_default_subnet.ecs_az2.id
-}
-
-output "default_subnet_az3_id" {
-  description = "Subnet ID for availability zone 3"
-  value       = aws_default_subnet.ecs_az3.id
+output "private_subnet_ids" {
+  description = "Private subnet IDs (ECS + RDS)"
+  value       = aws_subnet.private[*].id
 }
 
 # ============================================

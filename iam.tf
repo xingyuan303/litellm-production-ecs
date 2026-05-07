@@ -48,6 +48,9 @@ resource "aws_iam_role_policy" "ecs_task_execution_secrets_policy" {
         ]
         Resource = compact([
           aws_secretsmanager_secret.db_password.arn,
+          aws_secretsmanager_secret.database_url.arn,
+          var.litellm_master_key != "" ? aws_secretsmanager_secret.litellm_master_key[0].arn : "",
+          var.litellm_salt_key != "" ? aws_secretsmanager_secret.litellm_salt_key[0].arn : "",
           var.openai_api_key != "" ? aws_secretsmanager_secret.openai_api_key[0].arn : "",
           var.anthropic_api_key != "" ? aws_secretsmanager_secret.anthropic_api_key[0].arn : "",
           var.azure_api_key != "" ? aws_secretsmanager_secret.azure_api_key[0].arn : "",

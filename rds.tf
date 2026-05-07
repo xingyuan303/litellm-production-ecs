@@ -6,7 +6,7 @@
 resource "aws_security_group" "rds_sg" {
   name        = "${var.project_name}-rds-sg"
   description = "Security group for LiteLLM RDS PostgreSQL database"
-  vpc_id      = aws_default_vpc.default_vpc.id
+  vpc_id      = aws_vpc.main.id
 
   # Allow PostgreSQL access from ECS tasks only
   ingress {
@@ -36,11 +36,7 @@ resource "aws_security_group" "rds_sg" {
 # DB Subnet Group (for Multi-AZ deployment)
 resource "aws_db_subnet_group" "litellm_db_subnet_group" {
   name       = "${var.project_name}-db-subnet-group"
-  subnet_ids = [
-    aws_default_subnet.ecs_az1.id,
-    aws_default_subnet.ecs_az2.id,
-    aws_default_subnet.ecs_az3.id
-  ]
+  subnet_ids = aws_subnet.private[*].id
 
   tags = {
     Name        = "${var.project_name}-db-subnet-group"

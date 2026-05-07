@@ -12,7 +12,7 @@ data "aws_ec2_managed_prefix_list" "cloudfront" {
 resource "aws_security_group" "alb_sg" {
   name        = "${var.project_name}-alb-sg"
   description = "Security group for LiteLLM Application Load Balancer"
-  vpc_id      = aws_default_vpc.default_vpc.id
+  vpc_id      = aws_vpc.main.id
 
   # When CloudFront is enabled, only allow traffic from CloudFront
   dynamic "ingress" {
@@ -80,7 +80,7 @@ resource "aws_security_group" "alb_sg" {
 resource "aws_security_group" "ecs_tasks_sg" {
   name        = "${var.project_name}-ecs-tasks-sg"
   description = "Security group for LiteLLM ECS tasks"
-  vpc_id      = aws_default_vpc.default_vpc.id
+  vpc_id      = aws_vpc.main.id
 
   # Allow traffic from ALB on port 4000
   ingress {
@@ -114,11 +114,7 @@ resource "aws_lb" "litellm_alb" {
   load_balancer_type = "application"
   security_groups    = [aws_security_group.alb_sg.id]
 
-  subnets = [
-    aws_default_subnet.ecs_az1.id,
-    aws_default_subnet.ecs_az2.id,
-    aws_default_subnet.ecs_az3.id
-  ]
+  subnets = aws_subnet.public[*].id
 
   enable_deletion_protection = var.enable_deletion_protection
   enable_http2              = true
@@ -136,7 +132,7 @@ resource "aws_lb_target_group" "litellm_tg" {
   name        = "${var.project_name}-tg"
   port        = 4000
   protocol    = "HTTP"
-  vpc_id      = aws_default_vpc.default_vpc.id
+  vpc_id      = aws_vpc.main.id
   target_type = "ip" # Required for Fargate
 
   health_check {

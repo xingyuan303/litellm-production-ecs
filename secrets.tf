@@ -86,6 +86,65 @@ resource "aws_secretsmanager_secret_version" "gemini_api_key" {
   secret_string = var.gemini_api_key
 }
 
+# DATABASE_URL secret
+resource "aws_secretsmanager_secret" "database_url" {
+  name        = "${var.project_name}/database_url"
+  description = "PostgreSQL connection string for LiteLLM"
+
+  tags = {
+    Name        = "${var.project_name}-database-url"
+    Environment = var.environment
+    ManagedBy   = "Terraform"
+  }
+}
+
+resource "aws_secretsmanager_secret_version" "database_url" {
+  secret_id     = aws_secretsmanager_secret.database_url.id
+  secret_string = "postgresql://${var.db_username}:${urlencode(random_password.db_password.result)}@${aws_db_instance.litellm_db.address}:${aws_db_instance.litellm_db.port}/${var.db_name}"
+}
+
+# LITELLM_MASTER_KEY secret
+resource "aws_secretsmanager_secret" "litellm_master_key" {
+  count = var.litellm_master_key != "" ? 1 : 0
+
+  name        = "${var.project_name}/litellm_master_key"
+  description = "LiteLLM master key for authentication"
+
+  tags = {
+    Name        = "${var.project_name}-master-key"
+    Environment = var.environment
+    ManagedBy   = "Terraform"
+  }
+}
+
+resource "aws_secretsmanager_secret_version" "litellm_master_key" {
+  count = var.litellm_master_key != "" ? 1 : 0
+
+  secret_id     = aws_secretsmanager_secret.litellm_master_key[0].id
+  secret_string = var.litellm_master_key
+}
+
+# LITELLM_SALT_KEY secret
+resource "aws_secretsmanager_secret" "litellm_salt_key" {
+  count = var.litellm_salt_key != "" ? 1 : 0
+
+  name        = "${var.project_name}/litellm_salt_key"
+  description = "LiteLLM salt key for encryption"
+
+  tags = {
+    Name        = "${var.project_name}-salt-key"
+    Environment = var.environment
+    ManagedBy   = "Terraform"
+  }
+}
+
+resource "aws_secretsmanager_secret_version" "litellm_salt_key" {
+  count = var.litellm_salt_key != "" ? 1 : 0
+
+  secret_id     = aws_secretsmanager_secret.litellm_salt_key[0].id
+  secret_string = var.litellm_salt_key
+}
+
 # AWS Bedrock now uses IAM Role - no secrets needed! ✅
 # These secrets are commented out for security best practices
 #

@@ -16,14 +16,13 @@ terraform {
     }
   }
 
-  # Optional: Configure remote state
-  # Uncomment and configure for production
+  # Remote state: run bootstrap/ first, then uncomment and run `terraform init -migrate-state`
   # backend "s3" {
-  #   bucket         = "your-terraform-state-bucket"
+  #   bucket         = "litellm-terraform-state"
   #   key            = "litellm/terraform.tfstate"
   #   region         = "us-east-1"
   #   encrypt        = true
-  #   dynamodb_table = "terraform-state-lock"
+  #   dynamodb_table = "litellm-terraform-locks"
   # }
 }
 

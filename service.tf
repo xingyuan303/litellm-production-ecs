@@ -16,13 +16,9 @@ resource "aws_ecs_service" "litellm_service" {
 
   # Network configuration
   network_configuration {
-    subnets = [
-      aws_default_subnet.ecs_az1.id,
-      aws_default_subnet.ecs_az2.id,
-      aws_default_subnet.ecs_az3.id
-    ]
+    subnets          = aws_subnet.private[*].id
     security_groups  = [aws_security_group.ecs_tasks_sg.id]
-    assign_public_ip = true  # Required for pulling images from ECR
+    assign_public_ip = false
   }
 
   # Load balancer configuration
@@ -95,7 +91,7 @@ resource "aws_service_discovery_private_dns_namespace" "litellm" {
 
   name        = "${var.project_name}.local"
   description = "Private DNS namespace for LiteLLM service discovery"
-  vpc         = aws_default_vpc.default_vpc.id
+  vpc         = aws_vpc.main.id
 
   tags = {
     Name        = "${var.project_name}-namespace"
