@@ -5,10 +5,11 @@
 ## ✨ 特性
 
 - ✅ **高可用架构**: Multi-AZ 部署，ALB 负载均衡
+- ✅ **CloudFront 接入**: 通过 CloudFront 分发，ALB 仅允许 CloudFront 流量访问
 - ✅ **自动扩展**: 基于 CPU/内存/请求数量的自动扩展 (2-10 实例)
 - ✅ **托管数据库**: RDS PostgreSQL Multi-AZ，自动备份和恢复
 - ✅ **HTTPS 支持**: Route53 + ACM 自动证书管理
-- ✅ **安全加固**: Secrets Manager、加密存储、网络隔离
+- ✅ **安全加固**: Secrets Manager、加密存储、网络隔离、ALB 限制仅 CloudFront 访问
 - ✅ **监控告警**: CloudWatch 指标和告警，Performance Insights
 - ✅ **最新版本**: 使用 LiteLLM main-stable 分支
 - ✅ **生产就绪**: 包含完整的部署文档和故障排查指南
@@ -25,8 +26,13 @@
 └──────┬──────┘
        │
 ┌──────▼──────────────────────────────┐
+│   CloudFront Distribution           │
+│   (全球边缘节点，HTTPS)              │
+└──────┬──────────────────────────────┘
+       │ (仅允许 CloudFront IP)
+┌──────▼──────────────────────────────┐
 │   Application Load Balancer         │
-│   (Multi-AZ, HTTPS/HTTP)           │
+│   (Multi-AZ, HTTP)                  │
 └──────┬──────────────────────────────┘
        │
 ┌──────▼────────────────────────────────┐
@@ -49,9 +55,10 @@
 
 | 组件 | 说明 | 数量 |
 |-----|------|------|
+| **CloudFront** | CDN 分发 + HTTPS 终止 | 1 |
 | **ECS Fargate** | 无服务器容器 (4 vCPU, 8GB RAM) | 2-10 (自动扩展) |
 | **RDS PostgreSQL** | 托管数据库 (Multi-AZ) | 1 |
-| **Application Load Balancer** | 负载均衡器 (Multi-AZ) | 1 |
+| **Application Load Balancer** | 负载均衡器 (Multi-AZ，仅接受 CloudFront 流量) | 1 |
 | **Route53 + ACM** | DNS 和 SSL 证书 (可选) | 1 |
 | **Secrets Manager** | 密钥管理 | 多个 |
 | **CloudWatch** | 日志和监控 | 1 |
@@ -125,16 +132,40 @@ aws ecs update-service \
 ### 4. 验证
 
 ```bash
-# 获取访问 URL
-ALB_URL=$(terraform output -raw alb_url_http)
+# 获取 CloudFront 访问 URL
+CF_URL=$(terraform output -raw cloudfront_domain_name)
 
 # 测试健康检查
-curl $ALB_URL/health
+curl https://$CF_URL/health
 
 # 测试 API
-curl $ALB_URL/v1/models \
+curl https://$CF_URL/v1/models \
   -H "Authorization: Bearer $(terraform output -raw litellm_master_key)"
 ```
+
+## 🔌 客户端配置
+
+部署完成后，通过 CloudFront URL 访问 LiteLLM 代理：
+
+```bash
+# 在 ~/.zshrc 或 ~/.bashrc 中添加
+export ANTHROPIC_BASE_URL=https://<your-cloudfront-domain>
+export ANTHROPIC_API_KEY=<your-litellm-master-key>
+```
+
+支持的客户端：
+- **Claude Code** — 自动读取 `ANTHROPIC_BASE_URL` 环境变量
+- **OpenCode** — 在配置中设置 base URL 指向 CloudFront 域名
+
+可用模型名称（在客户端中使用）：
+- `claude-opus-4-7`
+- `claude-opus-4-6`
+- `claude-sonnet-4-6`
+- `claude-haiku-4-5`
+- `claude-opus-4-5`
+- `claude-sonnet-4-5`
+
+> **注意**: 不要在 base URL 末尾加 `/v1`，SDK 会自动拼接路径。
 
 ## 📖 完整文档
 
@@ -157,7 +188,8 @@ curl $ALB_URL/v1/models \
 
 | 文件 | 说明 |
 |-----|------|
-| `alb.tf` | Application Load Balancer 和安全组 |
+| `cloudfront.tf` | CloudFront 分发配置 |
+| `alb.tf` | Application Load Balancer 和安全组 (仅接受 CloudFront 流量) |
 | `rds.tf` | RDS PostgreSQL 数据库配置 |
 | `route53.tf` | Route53 DNS 和 ACM 证书 |
 | `autoscaling.tf` | ECS 自动扩展策略和告警 |
@@ -284,7 +316,8 @@ aws cloudwatch describe-alarms \
 - ✅ RDS 数据库加密
 - ✅ ECS 任务在私有子网
 - ✅ 安全组最小化权限
-- ✅ HTTPS 传输加密
+- ✅ HTTPS 传输加密 (CloudFront 终止 TLS)
+- ✅ ALB 安全组仅允许 CloudFront IP 段访问，禁止公网直连
 - ✅ IAM 角色最小权限
 
 ## 🚨 故障排查
