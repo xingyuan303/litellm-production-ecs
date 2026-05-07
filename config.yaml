@@ -51,6 +51,11 @@ model_list:
   # AWS Bedrock - Global Cross-Region Inference
   # Requests are routed to the nearest available region for better availability
   # Latest generation models
+  - model_name: claude-opus-4-7
+    litellm_params:
+      model: bedrock/global.anthropic.claude-opus-4-7
+      aws_region_name: us-east-1
+
   - model_name: claude-opus-4-6
     litellm_params:
       model: bedrock/global.anthropic.claude-opus-4-6-v1
