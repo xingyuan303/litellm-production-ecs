@@ -57,13 +57,13 @@ variable "ecs_max_capacity" {
 variable "ecs_task_cpu" {
   description = "CPU units for ECS task (1024 = 1 vCPU)"
   type        = number
-  default     = 4096
+  default     = 1024
 }
 
 variable "ecs_task_memory" {
   description = "Memory for ECS task in MB"
   type        = number
-  default     = 8192
+  default     = 2048
 }
 
 variable "enable_ecs_exec" {

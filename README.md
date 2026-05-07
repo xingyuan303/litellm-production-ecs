@@ -39,8 +39,8 @@
 │      ECS Fargate Cluster              │
 │  ┌─────┐  ┌─────┐       ┌─────┐     │
 │  │Task │  │Task │  ...  │Task │     │
-│  │4vCPU│  │4vCPU│       │4vCPU│     │
-│  │ 8GB │  │ 8GB │       │ 8GB │     │
+│  │1vCPU│  │1vCPU│       │1vCPU│     │
+│  │ 2GB │  │ 2GB │       │ 2GB │     │
 │  └──┬──┘  └──┬──┘       └──┬──┘     │
 └─────┼────────┼──────────────┼────────┘
       └────────┴──────────────┘
@@ -56,7 +56,7 @@
 | 组件 | 说明 | 数量 |
 |-----|------|------|
 | **CloudFront** | CDN 分发 + HTTPS 终止 | 1 |
-| **ECS Fargate** | 无服务器容器 (4 vCPU, 8GB RAM) | 2-10 (自动扩展) |
+| **ECS Fargate** | 无服务器容器 (1 vCPU, 2GB RAM) | 2-10 (自动扩展) |
 | **RDS PostgreSQL** | 托管数据库 (Multi-AZ) | 1 |
 | **Application Load Balancer** | 负载均衡器 (Multi-AZ，仅接受 CloudFront 流量) | 1 |
 | **Route53 + ACM** | DNS 和 SSL 证书 (可选) | 1 |
@@ -250,14 +250,14 @@ litellm_subdomain = "litellm.example.com"
 
 ## 💰 成本估算
 
-### 最小配置 (~$482/月)
-- 2 个 ECS 任务 (4vCPU, 8GB): ~$288/月
+### 最小配置 (~$230/月)
+- 2 个 ECS 任务 (1vCPU, 2GB): ~$36/月
 - RDS db.t3.medium Multi-AZ: ~$164/月
 - ALB: ~$23/月
 - 其他: ~$7/月
 
-### 生产配置 (~$1,069/月)
-- 平均 4 个 ECS 任务: ~$576/月
+### 生产配置 (~$500/月)
+- 平均 4 个 ECS 任务 (1vCPU, 2GB): ~$72/月
 - RDS db.r6g.xlarge Multi-AZ: ~$450/月
 - ALB: ~$23/月
 - 其他: ~$20/月
