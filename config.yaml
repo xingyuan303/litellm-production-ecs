@@ -90,6 +90,9 @@ litellm_settings:
   # Drop unsupported parameters
   drop_params: true
 
+  # Allow extra body parameters (e.g. context_management from Claude Code)
+  pass_through_extra_body: true
+
   # Set verbose logging (set to false in production)
   set_verbose: false
 
